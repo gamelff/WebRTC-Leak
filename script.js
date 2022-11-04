@@ -5,30 +5,26 @@ function findIP(onNewIP) {
     localIPs = {},
     ipRegex = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/g,
     key;
-
-  function ipIterate(ip) {
+}
+function ipIterate(ip) {
     if (!localIPs[ip]) onNewIP(ip);
     localIPs[ip] = true;
   }
-  try{
-  pc.createDataChannel("");
+pc.createDataChannel("");
   
-  pc.createOffer(function(sdp) {
-    sdp.sdp.split('\n').forEach(function(line) {
-      if (line.indexOf('candidate') < 0) return;
-      line.match(ipRegex).forEach(ipIterate);
-    });
-    pc.setLocalDescription(sdp, noop, noop);
-  }, noop);
+pc.createOffer(function(sdp) {
+  sdp.sdp.split('\n').forEach(function(line) {
+    if (line.indexOf('candidate') < 0) return;
+    line.match(ipRegex).forEach(ipIterate);
+  });
+  pc.setLocalDescription(sdp, noop, noop);
+}, noop);
   
-  pc.onicecandidate = function(ice) {
+pc.onicecandidate = function(ice) {
     if (!ice || !ice.candidate || !ice.candidate.candidate || !ice.candidate.candidate.match(ipRegex)) return;
     ice.candidate.candidate.match(ipRegex).forEach(ipIterate);
   };
-}
-} catch (err) {
-  alert(err);
-}
+
 
 
 var ul = document.createElement('ul');
